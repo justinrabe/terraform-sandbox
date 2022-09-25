@@ -11,8 +11,9 @@ provider "aws" {
 }
 resource "aws_instance" "leader" {
   count = 3
-  ami           = "ami-026b57f3c383c2eec"
+  ami = "ami-0f1ee03d06c4c659c"
   instance_type = "t2.micro"
+  
   tags = {
     Name = "leader-${count.index}"
   }
