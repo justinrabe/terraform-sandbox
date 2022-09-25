@@ -10,11 +10,38 @@ provider "aws" {
   secret_key = var.s_key
 }
 resource "aws_instance" "leader" {
-  count = 3
+  count = 1
   ami = "ami-0f1ee03d06c4c659c"
   instance_type = "t2.micro"
-  
+  key_name = "leader"
   tags = {
     Name = "leader-${count.index}"
+  }
+}
+
+resource "aws_security_group" "allow_rdp" {
+  name        = "allow_rdp"
+  description = "Allow RDP"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description      = "RDP"
+    from_port        = 3389
+    to_port          = 3389
+    protocol         = "rdp"
+    cidr_blocks      = [aws_vpc.main.cidr_block]
+    ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "allow_rdp"
   }
 }
