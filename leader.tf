@@ -22,15 +22,14 @@ resource "aws_instance" "leader" {
 resource "aws_security_group" "allow_rdp" {
   name        = "allow_rdp"
   description = "Allow RDP"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = "vpc-06806080a786563ca"
 
   ingress {
     description      = "RDP"
     from_port        = 3389
     to_port          = 3389
-    protocol         = "rdp"
-    cidr_blocks      = [aws_vpc.main.cidr_block]
-    ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
   }
 
   egress {
