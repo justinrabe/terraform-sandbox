@@ -1,0 +1,1 @@
+New-Item -Name "test1.txt" -Path "C:\"
