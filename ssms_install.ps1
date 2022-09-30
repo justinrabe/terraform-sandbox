@@ -1,1 +1,1 @@
-New-Item -Name "test1.txt" -Path "C:\"
+New-Item -Name "test12.txt" -Path "C:\"
