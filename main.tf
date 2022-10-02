@@ -9,12 +9,14 @@ provider "aws" {
   access_key = var.a_key
   secret_key = var.s_key
 }
+
 resource "aws_vpc" "prod-vpc" {
   cidr_block = "10.0.0.0/16"
   tags = {
     Name = "production-vpc"
   }
 }
+
 resource "aws_internet_gateway" "gw" {
     vpc_id = aws_vpc.prod-vpc.id
 }
@@ -29,7 +31,7 @@ resource "aws_route_table" "prod-route-table" {
 
   route {
     ipv6_cidr_block        = "::/0"
-    egress_only_gateway_id = aws_internet_gateway.gw.id
+    gateway_id = aws_internet_gateway.gw.id
   }
 
   tags = {
@@ -39,7 +41,7 @@ resource "aws_route_table" "prod-route-table" {
 
 resource "aws_subnet" "subnet-1" {
   vpc_id = aws_vpc.prod-vpc.id
-  cidr_block = "10.0.0.0/24"
+  cidr_block = "10.0.1.0/24"
   availability_zone = "us-east-1a"
 
   tags = {
@@ -104,13 +106,25 @@ resource "aws_eip" "one" {
   depends_on = [aws_internet_gateway.gw]
 }
 
-resource "aws_instance" {
+resource "aws_instance" "web-server" {
   ami = "ami-08c40ec9ead489470"
   instance_type = "t2.micro"
   availability_zone = "us-east-1a"
   key_name = "leader"
+
   network_interface {
     network_interface_id = aws_network_interface.web-server-nic.id
     device_index = 0
+  }
+
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo apt update -y
+              sudo apt install apache2 -y
+              sudo systemctl start apache2
+              sudo bash -c 'echo web server > /var/www/html/index.html'
+              EOF
+  tags = {
+    "Name" = "web-server"
   }
 }
